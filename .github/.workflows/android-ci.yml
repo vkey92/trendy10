@@ -2,14 +2,14 @@ name: Android CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ version-1.0-git-actions ]
   pull_request:
-    branches: [ main ]
+    branches: [ version-1.0-git-actions ]
 
 jobs:
   build:
 
-    runs-on: macos-latest   # macOS runner
+    runs-on: macos-latest
 
     steps:
       - name: Checkout code
