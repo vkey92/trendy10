@@ -34,9 +34,9 @@ class TrendyRepo @Inject constructor(private val trendyApi: TrendyApi) {
         val newsResponse = newsDeferred.await()
         val quotesResponse = quotesDeferred.await()
 
-        if (categoriesResponse.isSuccessful) {
-            _categories.emit(categoriesResponse.body().orEmpty())
-        }
+       // if (categoriesResponse.isSuccessful) {
+            _categories.emit(categoriesResponse.body()!!)
+        //}
         if (newsResponse.isSuccessful) {
             _newsCategories.emit(newsResponse.body().orEmpty())
         }
