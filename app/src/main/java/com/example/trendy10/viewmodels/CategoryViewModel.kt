@@ -34,7 +34,7 @@ class CategoryViewModel @Inject constructor(
         viewModelScope.launch {
             if (networkUtil.hasInternetConnection()) {
                 try {
-                    trendyRepo.getCategories()
+                    trendyRepo.loadAllCategories()
                 } catch (e: Exception) {
                     // Handle the exception
                     e.printStackTrace()

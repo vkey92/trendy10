@@ -2,6 +2,8 @@ package com.example.trendy10.repos
 
 import com.example.trendy10.api.TrendyApi
 import com.example.trendy10.models.TweetListItem
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -23,28 +25,27 @@ class TrendyRepo @Inject constructor(private val trendyApi: TrendyApi) {
     val tweets : StateFlow<List<TweetListItem>>
         get() = _tweets
 
-    suspend fun getCategories(){
-        val response = trendyApi.getCategories()
-        if(response.body() != null && response.isSuccessful){
-           _categories.emit(response.body()!!)
-           getNewsCategories()
+    suspend fun loadAllCategories() = coroutineScope {
+        val categoriesDeferred = async { trendyApi.getCategories() }
+        val newsDeferred = async { trendyApi.getNewsCategories() }
+        val quotesDeferred = async { trendyApi.getQuatoCategories() }
+
+        val categoriesResponse = categoriesDeferred.await()
+        val newsResponse = newsDeferred.await()
+        val quotesResponse = quotesDeferred.await()
+
+        if (categoriesResponse.isSuccessful) {
+            _categories.emit(categoriesResponse.body().orEmpty())
+        }
+        if (newsResponse.isSuccessful) {
+            _newsCategories.emit(newsResponse.body().orEmpty())
+        }
+        if (quotesResponse.isSuccessful) {
+            _quatoCategories.emit(quotesResponse.body().orEmpty())
         }
     }
 
-    suspend fun getNewsCategories(){
-        val response = trendyApi.getNewsCategories()
-        if(response.body() != null && response.isSuccessful){
-            _newsCategories.emit(response.body()!!)
-            getQuatoCategories()
-        }
-    }
 
-    suspend fun getQuatoCategories(){
-        val response = trendyApi.getQuatoCategories()
-        if(response.body() != null && response.isSuccessful){
-            _quatoCategories.emit(response.body()!!)
-        }
-    }
 
     suspend fun getTweets(category: String,type : String){
         val response = trendyApi.getTweets("$type[?(@.category==\"$category\")]")
